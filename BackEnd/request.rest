@@ -1,0 +1,24 @@
+###
+POST http://localhost:5000/users
+Content-Type: application/json
+
+{
+  "name": "Test User",
+  "email": "testuser@example.com",
+  "password": "password123"
+}
+###
+POST https://iot-project.store/api/twilio/webhook
+Content-Type: application/json
+
+{
+  "MessageSid": "SMXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+  "From": "+1234567890",
+  "To": "+0987654321",
+  "Body": "Hello, this is a test message!",
+  "NumMedia": 1,
+  "MediaUrl0": "https://example.com/media.jpg"
+}
+
+###
+GET https://iot-project.store/api/twilio/messages
