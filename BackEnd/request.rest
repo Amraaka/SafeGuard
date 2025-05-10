@@ -13,7 +13,7 @@ POST http://localhost:5000/webhook
 Content-Type: application/json
 
 {
-  "MessageSid": "SM1234567890",
+  "MessageSid": "SM12345678egd90",
   "From": "+1234567890",
   "To": "+0987654321",
   "Body": "Test message",
@@ -32,5 +32,5 @@ Content-Type: application/json
 }
 
 ###
-GET http://localhost:3000/api/messages
+GET https://92ad-202-55-188-85.ngrok-free.app/api/messages
 Content-Type: application/json
