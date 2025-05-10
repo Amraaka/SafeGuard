@@ -7,20 +7,30 @@ Content-Type: application/json
   "email": "testuser@example.com",
   "password": "password123"
 }
+
 ###
-POST https://iot-project.store/api/twilio/webhook
+POST http://localhost:5000/webhook
 Content-Type: application/json
 
 {
-  "MessageSid": "SMXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+  "MessageSid": "SM1234567890",
   "From": "+1234567890",
   "To": "+0987654321",
-  "Body": "Hello, this is a test message!",
-  "NumMedia": 1,
-  "MediaUrl0": "https://example.com/media.jpg"
+  "Body": "Test message",
+  "NumMedia": "0"
+}
+
+
+###
+POST https://ba53-202-55-188-85.ngrok-free.app/webhook
+Content-Type: application/json
+
+{
+  "From": "+1234567890",
+  "To": "+0987654321",
+  "Body": "Test message"
 }
 
 ###
-GET https://iot-project.store/api/twilio/messages
-
-
+GET http://localhost:3000/api/messages
+Content-Type: application/json

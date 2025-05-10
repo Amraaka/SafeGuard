@@ -1,63 +1,48 @@
-// const mongoose = require('mongoose');
-
-// const messageSchema = new mongoose.Schema({
-//   messageSid: String,
-//   from: String,
-//   to: String,
-//   body: String,
-//   numMedia: Number,
-//   mediaUrls: [String],
-//   status: String,
-//   direction: {
-//     type: String,
-//     default: 'inbound'
-//   },
-//   timestamp: { 
-//     type: Date, 
-//     default: Date.now 
-//   }
-// });
-
-// const Message = mongoose.model('Message', messageSchema);
-
-// module.exports = Message;
 const mongoose = require('mongoose');
 
 const messageSchema = new mongoose.Schema({
-  messageSid: {
-    type: String,
-    required: true,
-    unique: true
-  },
-  from: {
-    type: String,
-    required: true
-  },
-  to: {
-    type: String,
-    required: true
-  },
+  // Message content
   body: {
     type: String,
     required: true
   },
+  
+  // Twilio message SID
+  messageSid: {
+    type: String,
+    unique: true
+  },
+  
+  // Phone number that sent the message
+  from: {
+    type: String,
+    required: true
+  },
+  
+  // Phone number that received the message
+  to: {
+    type: String,
+    required: true
+  },
+  
+  // Additional Twilio metadata
   numMedia: {
     type: Number,
     default: 0
   },
-  mediaUrls: {
-    type: [String],
-    default: []
-  },
-  status: {
-    type: String,
-    enum: ['received', 'processed', 'error'],
-    default: 'received'
-  },
-  timestamp: {
+  
+  // Media URLs if any
+  mediaUrls: [{
+    type: String
+  }],
+  
+  // Creation timestamp
+  createdAt: {
     type: Date,
     default: Date.now
   }
 });
 
-module.exports = mongoose.model('Message', messageSchema);
+const Message = mongoose.model('Message', messageSchema);
+
+module.exports = Message;
