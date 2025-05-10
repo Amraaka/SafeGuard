@@ -91,7 +91,6 @@ router.get("/:id", async (req, res) => {
   }
 });
 
-
 router.post("/send", async (req, res) => {
   try {
     const { to, body } = req.body;
@@ -132,7 +131,7 @@ router.post("/send", async (req, res) => {
 
 router.post("/call", async (req, res) => {
   try {
-    const to = "+97685114648";
+    const to = "+97696068185";
     const from = process.env.TWILIO_PHONE_NUMBER;
 
     const twilioClient = require("twilio")(
@@ -143,7 +142,7 @@ router.post("/call", async (req, res) => {
     const call = await twilioClient.calls.create({
       to,
       from,
-      url: "https://766d-202-55-188-85.ngrok-free.app/voice.xml",
+      url: "https://3cc4-202-126-89-122.ngrok-free.app/voice.xml",
     });
 
     res.status(201).json({
