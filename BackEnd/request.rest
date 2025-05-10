@@ -44,5 +44,5 @@ Content-Type: application/json
 
 
 ###
-GET https://0be3-202-55-188-85.ngrok-free.app/api/messages/681fc47845b06f38d2ddd388
+GET https://0be3-202-55-188-85.ngrok-free.app/api/allMes/all
 Content-Type: application/json
