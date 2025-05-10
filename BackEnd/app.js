@@ -15,13 +15,9 @@ app.use(bodyParser.json());
 
 mongoose
   .connect(process.env.MONGO_URI)
-  .then(() => console.log("MongoDB connected successfully"))
-  .catch((err) => console.error("MongoDB connection error:", err));
-
-app.use("/api/messages", messageRoutes);
-
-// Use the new route for fetching all messages
-app.use("/api/allMes", getAllMessagesRoute);
+  .then(() => console.log('MongoDB connected successfully'))
+  .catch(err => console.error('MongoDB connection error:', err));
+app.use('/api/messages', messageRoutes);
 
 app.get("/", (req, res) => {
   res.send("Twilio Webhook Server is running!");
