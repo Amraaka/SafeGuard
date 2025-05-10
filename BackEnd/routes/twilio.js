@@ -88,18 +88,18 @@ router.post('/webhook', async (req, res) => {
       from: From,
       to: To,
       body: Body,
-      numMedia: parseInt(NumMedia),
-      status: 'received'
+      numMedia,
+      status: "received",
     });
-    
-    if (parseInt(NumMedia) > 0) {
+
+    if (numMedia > 0) {
       const mediaUrls = [];
-      for (let i = 0; i < parseInt(NumMedia); i++) {
+      for (let i = 0; i < numMedia; i++) {
         mediaUrls.push(req.body[`MediaUrl${i}`]);
       }
       message.mediaUrls = mediaUrls;
     }
-    
+
     await message.save();
     console.log(`Message saved: ${MessageSid}`);
     
@@ -130,7 +130,6 @@ router.post('/webhook', async (req, res) => {
         <Message>Мэдээлэл хүлээн авлаа! Мессеж хадгалагдсан.</Message>
       </Response>
     `);
-    
   } catch (error) {
     console.error('Error processing message:', error);
     res.status(500).send('Error processing message');
@@ -158,8 +157,8 @@ router.get('/messages', async (req, res) => {
     const messages = await Message.find().sort({ timestamp: -1 });
     res.json(messages);
   } catch (error) {
-    console.error('Error fetching messages:', error);
-    res.status(500).json({ error: 'Failed to retrieve messages' });
+    console.error("Error fetching messages:", error);
+    res.status(500).json({ error: "Failed to retrieve messages" });
   }
 });
 
