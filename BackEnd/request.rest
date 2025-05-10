@@ -1,36 +1,48 @@
-###
-POST http://localhost:5000/users
-Content-Type: application/json
-
-{
-  "name": "Test User",
-  "email": "testuser@example.com",
-  "password": "password123"
-}
 
 ###
-POST http://localhost:5000/webhook
-Content-Type: application/json
-
-{
-  "MessageSid": "SM1234567890",
-  "From": "+1234567890",
-  "To": "+0987654321",
-  "Body": "Test message",
-  "NumMedia": "0"
-}
-
-
-###
-POST https://ba53-202-55-188-85.ngrok-free.app/webhook
+POST https://0be3-202-55-188-85.ngrok-free.app/api/messages/webhook
 Content-Type: application/json
 
 {
   "From": "+1234567890",
-  "To": "+0987654321",
+  "To": "+97685114648",
   "Body": "Test message"
 }
 
 ###
 GET http://localhost:3000/api/messages
+Content-Type: application/json
+
+
+###
+POST https://92ad-202-55-188-85.ngrok-free.app/api/messages/send
+Content-Type: application/json
+
+ {
+  "to": "+97685114648",
+  "body": "Dangerous!!!",
+
+ }
+
+
+###
+POST https://0be3-202-55-188-85.ngrok-free.app/api/messages/send
+Content-Type: application/json
+
+{
+  "to": "+97685114648",
+  "body": "Сэрэмжлүүлэг мессэжийг таньд илгээж байна.!"
+}
+
+###
+POST https://766d-202-55-188-85.ngrok-free.app/api/messages/call
+Content-Type: application/json
+
+###
+GET https://0be3-202-55-188-85.ngrok-free.app/api/messages/1
+Content-Type: application/json
+
+
+###
+GET https://0be3-202-55-188-85.ngrok-free.app/api/messages/681fc47845b06f38d2ddd388
 Content-Type: application/json

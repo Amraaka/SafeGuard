@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const dotenv = require('dotenv');
 const messageRoutes = require('./routes/messageRoutes');
+require('./messageWatcher');
 
 dotenv.config();
 
@@ -18,18 +19,20 @@ mongoose
 
 app.use('/api/messages', messageRoutes);
 
-// Basic health check route
 app.get('/', (req, res) => {
   res.send('Twilio Webhook Server is running!');
 });
 
-// Error handling middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).send('Something went wrong!');
 });
 
-// Start server
+const cors = require('cors');
+
+// Enable CORS for all origins
+app.use(cors());
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
