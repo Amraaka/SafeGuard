@@ -257,13 +257,13 @@ export default function Home() {
         </div>
       )}
       
-      {/* Delete Confirmation Modal */}
-      {/* <DeleteConfirmationModal
+
+      <DeleteConfirmationModal
         isOpen={isDeleteModalOpen}
         onClose={closeDeleteModal}
         onConfirm={handleConfirmDelete}
         messageData={messageToDelete}
-      /> */}
+      />
     </div>
   );
 }
