@@ -76,8 +76,8 @@ router.post("/webhook", async (req, res) => {
     const authToken = process.env.TWILIO_AUTH_TOKEN;
     const client = new twilio(accountSid, authToken);
     client.messages.create({
-    to: 'TO_PHONE',       // Replace with the recipient's phone number
-    from: 'FROM_PHONE',   // Replace with your Twilio phone number
+    to: VERIFIED_PHONE_NUMBER,       // Replace with the recipient's phone number
+    from: TWILIO_PHONE_NUMBER,   // Replace with your Twilio phone number
     body: 'utastaas twilio'
      }).then(message => console.log("SMS илгээгдлээ. SID:", message.sid))
     .catch(error => console.error("Алдаа гарлаа:", error));
