@@ -51,7 +51,6 @@ router.post("/webhook", async (req, res) => {
     } = req.body;
     console.log("Received message:", req.body);
     
-    // Save incoming message to database
     const mediaUrls = [];
     if (parseInt(numMedia) > 0) {
       for (let i = 0; i < parseInt(numMedia); i++) {
