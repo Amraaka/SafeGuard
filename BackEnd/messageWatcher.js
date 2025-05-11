@@ -16,11 +16,13 @@ let lastProcessedTime = new Date();
 async function checkForNewMessages() {
   try {
     const now = new Date();
-    console.log(`Checking for new messages between ${lastProcessedTime} and ${now}`);
+    console.log(
+      `Checking for new messages between ${lastProcessedTime} and ${now}`
+    );
 
     const newMessages = await Message.find({
       status: "received",
-      createdAt: { $gte: lastProcessedTime, $lt: now }
+      createdAt: { $gte: lastProcessedTime, $lt: now },
     }).sort({ createdAt: 1 }); // Process in chronological order
 
     if (newMessages.length === 0) {
@@ -41,10 +43,13 @@ async function checkForNewMessages() {
         // Only update status if send was successful
         message.status = "processed";
         await message.save();
-        
+
         console.log(`Successfully processed message ${message._id}`);
       } catch (error) {
-        console.error(`Failed to process message ${message._id}:`, error.message);
+        console.error(
+          `Failed to process message ${message._id}:`,
+          error.message
+        );
         // Update status to failed and store the error
         message.status = "failed";
         message.error = error.message;
@@ -63,9 +68,9 @@ async function sendResponseMessage(message) {
 
   try {
     const response = await axios.post(
-      "https://db43-202-21-114-93.ngrok-free.app/api/message/send",
+      "https://8f64-202-21-114-93.ngrok-free.app/api/message/send",
       {
-        to: message.from, 
+        to: +97699334270,
         body: responseBody,
       },
       {
@@ -73,7 +78,7 @@ async function sendResponseMessage(message) {
           "Content-Type": "application/json",
           // Add any required authentication headers here
         },
-        timeout: 10000 // 10-second timeout
+        timeout: 10000, // 10-second timeout
       }
     );
 
@@ -84,7 +89,11 @@ async function sendResponseMessage(message) {
     console.log("Response sent successfully to", message.from);
     return response.data;
   } catch (error) {
-    console.error("Failed to send response message to", message.from, error.message);
+    console.error(
+      "Failed to send response message to",
+      message.from,
+      error.message
+    );
     throw error; // Re-throw to be caught by the calling function
   }
 }

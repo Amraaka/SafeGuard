@@ -1,6 +1,6 @@
 
 ###
-POST https://db43-202-21-114-93.ngrok-free.app/api/messages/webhook
+POST https://8f64-202-21-114-93.ngrok-free.app/api/messages/webhook
 Content-Type: application/json
 {
       "body": "Сэрэмжлүүлэг мессэжийг таньд илгээж байна.!",
@@ -10,7 +10,7 @@ Content-Type: application/json
       "numMedia": 1,
 }
 ###
-POST https://db43-202-21-114-93.ngrok-free.app/api/messages/webhook
+POST https://8f64-202-21-114-93.ngrok-free.app/api/messages/webhook
 Content-Type: application/json
 
 {
@@ -26,13 +26,13 @@ GET http://localhost:5000/api/messages
 Content-Type: application/json
 
 ###
-POST https://db43-202-21-114-93.ngrok-free.app/api/messages/send
+POST https://8f64-202-21-114-93.ngrok-free.app/api/messages/send
 Content-Type: application/json
 
 {
-  "from": "+19787979795",
-  "to": "+97699334270",
-  "body": "Сэрэмжлүүлэг мессэжийг таньд илгээж байна.!"
+  "from": "+18037973879",
+  "to": "+97685114648",
+  "body": "Сэрэмжлүүлэг мессэжийг таньд илгээж байна.!11"
 }
 
 
@@ -55,14 +55,15 @@ Content-Type: application/json
 
 
 ###
-POST https://db43-202-21-114-93.ngrok-free.app/api/messages/webhook
+POST https://8f64-202-21-114-93.ngrok-free.app/api/messages/webhook
 Content-Type: application/x-www-form-urlencoded
 
-Body=123456dd
-&From=+19787979795
-&To=+97699334270
-&MessageSid=SM{{$guid}}
-&NumMedia=0
+&Body=Amaraaa12345
+&From=+97685114648
+&To=+18037973879
+
+# &MessageSid=SM{{$guid}}
+# &NumMedia=0
 
 
 
