@@ -1,12 +1,15 @@
 'use client';
 import { useState, useEffect } from 'react';
 import styles from './home.module.css';
+import DeleteConfirmationModal from './DeleteConfirmationModal';
 
 export default function Home() {
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [serverStatus, setServerStatus] = useState('checking');
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [messageToDelete, setMessageToDelete] = useState(null);
   
   // You might need to adjust this URL based on your deployment
   const API_URL = 'http://localhost:5000'; 
@@ -33,11 +36,25 @@ export default function Home() {
     }
   };
 
-  const deleteMessage = async (id) => {
-    if (!window.confirm("Та энэ мессежийг устгахдаа итгэлтэй байна уу?")) return;
+  // Open delete confirmation modal
+  const openDeleteModal = (message) => {
+    setMessageToDelete(message);
+    setIsDeleteModalOpen(true);
+  };
 
+  // Close delete confirmation modal
+  const closeDeleteModal = () => {
+    setIsDeleteModalOpen(false);
+    // Clear the message to delete after a short delay (for animation)
+    setTimeout(() => setMessageToDelete(null), 200);
+  };
+
+  // Handle confirmed delete
+  const handleConfirmDelete = async () => {
+    if (!messageToDelete) return;
+    
     try {
-      const response = await fetch(`${API_URL}/api/messages/${id}`, {
+      const response = await fetch(`${API_URL}/api/messages/${messageToDelete._id}`, {
         method: 'DELETE',
         headers: {
           'Accept': 'application/json',
@@ -52,11 +69,15 @@ export default function Home() {
       const result = await response.json();
       console.log('Deleted:', result);
 
+      // Close modal
+      closeDeleteModal();
+      
       // Refresh messages after delete
       fetchMessages();
     } catch (err) {
       console.error('Устгахад алдаа гарлаа:', err);
       alert('Мессеж устгаж чадсангүй');
+      closeDeleteModal();
     }
   };
 
@@ -217,7 +238,7 @@ export default function Home() {
                       <td>
                         <button 
                           className={styles.deleteButton} 
-                          onClick={() => deleteMessage(message._id)}
+                          onClick={() => openDeleteModal(message)}
                           aria-label="Устгах"
                         >
                           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2">
@@ -235,6 +256,14 @@ export default function Home() {
           )}
         </div>
       )}
+      
+      {/* Delete Confirmation Modal */}
+      {/* <DeleteConfirmationModal
+        isOpen={isDeleteModalOpen}
+        onClose={closeDeleteModal}
+        onConfirm={handleConfirmDelete}
+        messageData={messageToDelete}
+      /> */}
     </div>
   );
 }

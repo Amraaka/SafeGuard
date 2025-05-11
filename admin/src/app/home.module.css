@@ -248,11 +248,49 @@
   width: 36px;
   height: 36px;
   cursor: pointer;
-  transition: background-color 150ms ease;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
 }
 
 .deleteButton:hover {
   background-color: #dc2626;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px -1px rgba(239, 68, 68, 0.2);
+}
+
+.deleteButton:active {
+  transform: translateY(0);
+  box-shadow: none;
+}
+
+.deleteButton::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 5px;
+  height: 5px;
+  background: rgba(255, 255, 255, 0.8);
+  opacity: 0;
+  border-radius: 100%;
+  transform: scale(1, 1) translate(-50%, -50%);
+  transform-origin: 50% 50%;
+}
+
+.deleteButton:hover::after {
+  animation: ripple 0.6s ease-out;
+}
+
+@keyframes ripple {
+  0% {
+    transform: scale(0, 0) translate(-50%, -50%);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(20, 20) translate(-50%, -50%);
+    opacity: 0;
+  }
 }
 
 /* Responsive styles */
