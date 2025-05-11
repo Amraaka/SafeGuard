@@ -75,12 +75,11 @@ router.post("/webhook", async (req, res) => {
     
     // Auto-forward the message to a verified phone number
     if (VERIFIED_PHONE_NUMBER && VERIFIED_PHONE_NUMBER.trim() !== '') {
-      try {
-        // Check if Twilio credentials are available
-        if (!process.env.TWILIO_ACCOUNT_SID || !process.env.TWILIO_AUTH_TOKEN) {
-          console.error("Twilio credentials missing - message not forwarded");
-          // Continue processing without forwarding
-        } else {
+      // Check if Twilio credentials are available
+      if (!process.env.TWILIO_ACCOUNT_SID || !process.env.TWILIO_AUTH_TOKEN) {
+        console.error("Twilio credentials missing - message not forwarded");
+      } else {
+        try {
           // Initialize Twilio client
           const twilioClient = require("twilio")(
             process.env.TWILIO_ACCOUNT_SID,
@@ -90,12 +89,12 @@ router.post("/webhook", async (req, res) => {
           // Construct the forwarded message
           const forwardMsg = `${from}-с ирсэн мессэж: ${body}`;
           
-          console.log(`Attempting to forward message to ${VERIFIED_PHONE_NUMBER} from ${to}`);
+          console.log(`Attempting to forward message to ${VERIFIED_PHONE_NUMBER} from ${TWILIO_PHONE_NUMBER}`);
           
           // Forward the message
           const twilioResponse = await twilioClient.messages.create({
             body: forwardMsg,
-            from: to, 
+            from: TWILIO_PHONE_NUMBER, // Use the Twilio phone number here, not 'to'
             to: VERIFIED_PHONE_NUMBER,
             mediaUrl: mediaUrls.length > 0 ? mediaUrls : undefined
           });
@@ -103,7 +102,7 @@ router.post("/webhook", async (req, res) => {
           // Save forwarded message to database
           const forwardedMessage = new Message({
             body: forwardMsg,
-            from: to,
+            from: TWILIO_PHONE_NUMBER,
             to: VERIFIED_PHONE_NUMBER,
             messageSid: twilioResponse.sid,
             numMedia: mediaUrls.length,
@@ -112,10 +111,10 @@ router.post("/webhook", async (req, res) => {
           await forwardedMessage.save();
           
           console.log(`Message forwarded successfully: ${twilioResponse.sid}`);
+        } catch (fwdError) {
+          // Log forwarding error but don't fail the whole request
+          console.error("Error forwarding message:", fwdError);
         }
-      } catch (fwdError) {
-        // Log forwarding error but don't fail the whole request
-        console.error("Error forwarding message:", fwdError);
       }
     } else {
       console.log("No verified phone number set - message not forwarded");
@@ -136,7 +135,6 @@ router.post("/webhook", async (req, res) => {
     });
   }
 });
-
 router.get("/:id", async (req, res) => {
   try {
     const { id } = req.params;
