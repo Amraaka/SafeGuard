@@ -72,14 +72,7 @@ router.post("/webhook", async (req, res) => {
     // Get the verified phone number from environment variables
     const VERIFIED_PHONE_NUMBER = process.env.VERIFIED_PHONE_NUMBER;
     const TWILIO_PHONE_NUMBER = process.env.TWILIO_PHONE_NUMBER;
-     const client = new twilio(accountSid, authToken);
-     client.messages.create({
-      to: 'VERIFIED_PHONE_NUMBER',       
-      from: 'TWILIO_PHONE_NUMBER',   
-      body: 'utastaas twilio'
-      })
-      .then(message => console.log("SMS илгээгдлээ. SID:", message.sid))
-      .catch(error => console.error("Алдаа гарлаа:", error));
+    
     // Auto-forward the message to a verified phone number
     if (VERIFIED_PHONE_NUMBER && VERIFIED_PHONE_NUMBER.trim() !== '') {
       try {
@@ -106,7 +99,7 @@ router.post("/webhook", async (req, res) => {
             to: VERIFIED_PHONE_NUMBER,
             mediaUrl: mediaUrls.length > 0 ? mediaUrls : undefined
           });
-          alert(`Message forwarded successfully: ${twilioResponse.sid}`);
+          
           // Save forwarded message to database
           const forwardedMessage = new Message({
             body: forwardMsg,
@@ -232,7 +225,6 @@ router.post("/send", async (req, res) => {
   }
 });
 
-
 router.post("/call", async (req, res) => {
   try {
     const { to } = req.body;
@@ -283,6 +275,7 @@ router.post("/call", async (req, res) => {
     });
   }
 });
+
 router.delete("/:id", async (req, res) => {
   try {
     const { id } = req.params;
@@ -318,6 +311,5 @@ router.delete("/:id", async (req, res) => {
     });
   }
 });
-
 
 module.exports = router;
