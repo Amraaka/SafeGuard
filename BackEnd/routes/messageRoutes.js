@@ -136,7 +136,7 @@ router.post("/webhook", async (req, res) => {
   }
 });
 
-Get a specific message by ID
+
 router.get("/:id", async (req, res) => {
   try {
     const { id } = req.params;
@@ -225,7 +225,7 @@ router.post("/send", async (req, res) => {
   }
 });
 
-Initiate a call via Twilio
+
 router.post("/call", async (req, res) => {
   try {
     const { to } = req.body;
