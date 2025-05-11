@@ -5,6 +5,7 @@ const dotenv = require("dotenv");
 
 dotenv.config();
 
+// Initialize MongoDB connection
 mongoose
   .connect(process.env.MONGO_URI)
   .then(() => console.log("MongoDB connected for message watcher"))
@@ -15,10 +16,12 @@ let lastProcessedTime = new Date();
 async function checkForNewMessages() {
   try {
     const now = new Date();
+    console.log(`Checking for new messages between ${lastProcessedTime} and ${now}`);
+
     const newMessages = await Message.find({
       status: "received",
       createdAt: { $gte: lastProcessedTime, $lt: now }
-    }).sort({ createdAt: 1 }); // Process in order
+    }).sort({ createdAt: 1 }); // Process in chronological order
 
     if (newMessages.length === 0) {
       console.log("No new messages to process");
@@ -26,8 +29,10 @@ async function checkForNewMessages() {
       return;
     }
 
+    console.log(`Found ${newMessages.length} new messages to process`);
+
     for (const message of newMessages) {
-      console.log(`Processing new message: ${message.messageSid}`);
+      console.log(`Processing message ID: ${message._id} to ${message.from}`);
 
       try {
         // Send a response message
@@ -37,44 +42,70 @@ async function checkForNewMessages() {
         message.status = "processed";
         await message.save();
         
-        console.log(`Message processed: ${message._id}`);
+        console.log(`Successfully processed message ${message._id}`);
       } catch (error) {
-        console.error(`Failed to process message ${message._id}:`, error);
-        // Consider adding retry logic or moving to failed status
+        console.error(`Failed to process message ${message._id}:`, error.message);
+        // Update status to failed and store the error
+        message.status = "failed";
+        message.error = error.message;
+        await message.save();
       }
     }
 
     lastProcessedTime = now;
   } catch (error) {
-    console.error("Error checking for new messages:", error);
+    console.error("Error in checkForNewMessages:", error.message);
   }
 }
 
 async function sendResponseMessage(message) {
   const responseBody = `We received your message: "${message.body}"`;
 
-  const response = await axios.post(
-    "https://db43-202-21-114-93.ngrok-free.app/api/message/send",
-    {
-      to: message.from, // Send back to the original sender
-      body: responseBody,
-    }
-  );
+  try {
+    const response = await axios.post(
+      "https://db43-202-21-114-93.ngrok-free.app/api/message/send",
+      {
+        to: message.from, 
+        body: responseBody,
+      },
+      {
+        headers: {
+          "Content-Type": "application/json",
+          // Add any required authentication headers here
+        },
+        timeout: 10000 // 10-second timeout
+      }
+    );
 
-  console.log("Response sent successfully:", response.data);
+    if (response.status !== 200) {
+      throw new Error(`API responded with status ${response.status}`);
+    }
+
+    console.log("Response sent successfully to", message.from);
+    return response.data;
+  } catch (error) {
+    console.error("Failed to send response message to", message.from, error.message);
+    throw error; // Re-throw to be caught by the calling function
+  }
 }
 
 console.log("Starting message watcher...");
 
 // Initial delay to let the server stabilize
 setTimeout(() => {
-  checkForNewMessages();
+  checkForNewMessages().catch(console.error);
   setInterval(checkForNewMessages, 15000);
 }, 5000);
 
 // Handle graceful shutdown
 process.on("SIGINT", async () => {
   console.log("Shutting down message watcher...");
-  await mongoose.connection.close();
-  process.exit(0);
+  try {
+    await mongoose.connection.close();
+    console.log("MongoDB connection closed");
+    process.exit(0);
+  } catch (err) {
+    console.error("Error during shutdown:", err);
+    process.exit(1);
+  }
 });
