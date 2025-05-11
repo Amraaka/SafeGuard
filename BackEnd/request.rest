@@ -58,7 +58,7 @@ Content-Type: application/json
 POST https://db43-202-21-114-93.ngrok-free.app/api/messages/webhook
 Content-Type: application/x-www-form-urlencoded
 
-Body=123456ssssssdddйй
+Body=123456ddssssssdddйй
 &From=+19787979795
 &To=+97696068185
 &MessageSid=SM{{$guid}}
