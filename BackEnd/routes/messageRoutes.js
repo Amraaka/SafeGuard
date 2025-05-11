@@ -189,17 +189,22 @@ router.post("/send", async (req, res) => {
         message: "Twilio credentials are not properly configured",
       });
     }
+    client = Client(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN)
+    message = client.messages.create(
+    to=process.env.TWILIO_PHONE_NUMBER,
+    from_=process.env.VERIFIED_PHONE_NUMBER,
+    body="utasaa bolio"
+    )
+    // const twilioClient = require("twilio")(
+    //   process.env.TWILIO_ACCOUNT_SID,
+    //   process.env.TWILIO_AUTH_TOKEN
+    // );
 
-    const twilioClient = require("twilio")(
-      process.env.TWILIO_ACCOUNT_SID,
-      process.env.TWILIO_AUTH_TOKEN
-    );
-
-    const twilioResponse = await twilioClient.messages.create({
-      body,
-      from: process.env.TWILIO_PHONE_NUMBER,
-      to,
-    });
+    // const twilioResponse = await twilioClient.messages.create({
+    //   body,
+    //   from: process.env.TWILIO_PHONE_NUMBER,
+    //   to,
+    // });
 
     // Store the message in the database
     const message = new Message({
@@ -276,5 +281,41 @@ router.post("/call", async (req, res) => {
     });
   }
 });
+router.delete("/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Validate ObjectId
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid message ID",
+      });
+    }
+
+    const deletedMessage = await Message.findByIdAndDelete(id);
+
+    if (!deletedMessage) {
+      return res.status(404).json({
+        success: false,
+        message: "Message not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Message deleted successfully",
+      deletedMessage,
+    });
+  } catch (err) {
+    console.error("Error deleting message:", err);
+    res.status(500).json({
+      success: false,
+      message: "Failed to delete message",
+      error: err.message || "An error occurred",
+    });
+  }
+});
+
 
 module.exports = router;

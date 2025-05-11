@@ -9,7 +9,6 @@ export default function Home() {
   const [serverStatus, setServerStatus] = useState('checking');
   
   // You might need to adjust this URL based on your deployment
-  // Try using the full URL including protocol
   const API_URL = 'http://localhost:5000'; 
 
   // Check if the server is running when component mounts
@@ -31,6 +30,33 @@ export default function Home() {
     } catch (err) {
       console.error('Server status check failed:', err);
       setServerStatus('offline');
+    }
+  };
+
+  const deleteMessage = async (id) => {
+    if (!window.confirm("Та энэ мессежийг устгахдаа итгэлтэй байна уу?")) return;
+
+    try {
+      const response = await fetch(`${API_URL}/api/messages/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Алдаа: ${response.status}`);
+      }
+
+      const result = await response.json();
+      console.log('Deleted:', result);
+
+      // Refresh messages after delete
+      fetchMessages();
+    } catch (err) {
+      console.error('Устгахад алдаа гарлаа:', err);
+      alert('Мессеж устгаж чадсангүй');
     }
   };
 
@@ -101,64 +127,111 @@ export default function Home() {
 
   return (
     <div className={styles.container}>
-      <h1 className={styles.title}>Мессежүүдийн жагсаалт</h1>
+      <div className={styles.header}>
+        <h1 className={styles.title}>Мессежүүдийн жагсаалт</h1>
+        
+        {/* Server status indicator */}
+        <div className={styles.serverStatus}>
+          <div className={styles.statusLabel}>Сервер статус:</div>
+          <div className={`${styles.statusBadge} ${styles[serverStatus]}`}>
+            {serverStatus === 'checking' && 'Шалгаж байна...'}
+            {serverStatus === 'online' && 'Онлайн'}
+            {serverStatus === 'offline' && 'Офлайн - серверийг асаана уу'}
+            {serverStatus === 'error' && 'Алдаатай холболт'}
+          </div>
+        </div>
+      </div>
       
-      {/* Server status indicator */}
-      <div className={styles.serverStatus}>
-        Сервер статус: {' '}
-        <span className={`${styles.statusIndicator} ${styles[serverStatus]}`}>
-          {serverStatus === 'checking' && 'Шалгаж байна...'}
-          {serverStatus === 'online' && 'Онлайн'}
-          {serverStatus === 'offline' && 'Офлайн - серверийг асаана уу'}
-          {serverStatus === 'error' && 'Алдаатай холболт'}
-        </span>
+      <div className={styles.controlPanel}>
         <button 
-          className={styles.statusCheckButton} 
+          className={`${styles.button} ${styles.checkButton}`}
           onClick={checkServerStatus}
           disabled={serverStatus === 'checking'}
         >
+          <svg className={styles.buttonIcon} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M20 6L9 17l-5-5" />
+          </svg>
           Статус шалгах
         </button>
-      </div>
-      
-      <div className={styles.controls}>
+        
         <button 
-          className={styles.refreshButton} 
+          className={`${styles.button} ${styles.refreshButton}`}
           onClick={fetchMessages}
           disabled={loading || serverStatus === 'offline'}
         >
+          <svg className={styles.buttonIcon} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M23 4v6h-6M1 20v-6h6" />
+            <path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15" />
+          </svg>
           Шинэчлэх
         </button>
       </div>
       
-      {loading && <p className={styles.loading}>Ачааллаж байна...</p>}
-      {error && <p className={styles.error}>Алдаа: {error}</p>}
+      {loading && (
+        <div className={styles.loadingContainer}>
+          <div className={styles.loadingSpinner}></div>
+          <p>Ачааллаж байна...</p>
+        </div>
+      )}
+      
+      {error && <div className={styles.errorAlert}>
+        <svg className={styles.errorIcon} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2">
+          <circle cx="12" cy="12" r="10" />
+          <line x1="12" y1="8" x2="12" y2="12" />
+          <line x1="12" y1="16" x2="12.01" y2="16" />
+        </svg>
+        <p>Алдаа: {error}</p>
+      </div>}
       
       {!loading && !error && (
-        <div className={styles.messageList}>
+        <div className={styles.messageListContainer}>
           {messages.length === 0 ? (
-            <p>Мессеж олдсонгүй</p>
+            <div className={styles.emptyState}>
+              <svg className={styles.emptyIcon} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="64" height="64" fill="none" stroke="currentColor" strokeWidth="1">
+                <rect x="2" y="4" width="20" height="16" rx="2" />
+                <path d="M22 7l-10 5-10-5" />
+              </svg>
+              <p>Мессеж олдсонгүй</p>
+            </div>
           ) : (
-            <table className={styles.messageTable}>
-              <thead>
-                <tr>
-                  <th>Илгээгч</th>
-                  <th>Текст</th>
-                  <th>Огноо</th>
-                </tr>
-              </thead>
-              <tbody>
-                {messages.map(message => (
-                  <tr key={message._id || message.messageSid} className={styles.messageRow}>
-                    <td className={styles.sender}>{message.from}</td>
-                    <td className={styles.messageBody}>{message.body}</td>
-                    <td className={styles.date}>
-                      {new Date(message.createdAt).toLocaleString('mn-MN')}
-                    </td>
+            <div className={styles.tableWrapper}>
+              <table className={styles.messageTable}>
+                <thead>
+                  <tr>
+                    <th>Илгээгч</th>
+                    <th>Хүлээн авагч</th>
+                    <th>Тайлбар</th>
+                    <th>Огноо</th>
+                    <th>Үйлдэл</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {messages.map(message => (
+                    <tr key={message._id || message.messageSid} className={styles.messageRow}>
+                      <td className={styles.sender}>{message.from}</td>
+                      <td className={styles.recipient}>{message.to}</td>
+                      <td className={styles.messageBody}>{message.body}</td>
+                      <td className={styles.date}>
+                        {new Date(message.createdAt).toLocaleString('mn-MN')}
+                      </td>
+                      <td>
+                        <button 
+                          className={styles.deleteButton} 
+                          onClick={() => deleteMessage(message._id)}
+                          aria-label="Устгах"
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2">
+                            <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
+                            <line x1="10" y1="11" x2="10" y2="17" />
+                            <line x1="14" y1="11" x2="14" y2="17" />
+                          </svg>
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           )}
         </div>
       )}
