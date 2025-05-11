@@ -3,7 +3,7 @@ const router = express.Router();
 const Message = require("../models/Message");
 const { MessagingResponse } = require("twilio").twiml;
 const mongoose = require("mongoose");
-
+const twilio = require('twilio');
 router.get("/", async (req, res) => {
   try {
     const messages = await Message.find().sort({ createdAt: -1 });
@@ -72,53 +72,61 @@ router.post("/webhook", async (req, res) => {
     // Get the verified phone number from environment variables
     const VERIFIED_PHONE_NUMBER = process.env.VERIFIED_PHONE_NUMBER;
     const TWILIO_PHONE_NUMBER = process.env.TWILIO_PHONE_NUMBER;
-    
-    // Auto-forward the message to a verified phone number
-    if (VERIFIED_PHONE_NUMBER && VERIFIED_PHONE_NUMBER.trim() !== '') {
-      // Check if Twilio credentials are available
-      if (!process.env.TWILIO_ACCOUNT_SID || !process.env.TWILIO_AUTH_TOKEN) {
-        console.error("Twilio credentials missing - message not forwarded");
-      } else {
-        try {
-          // Initialize Twilio client
-          const twilioClient = require("twilio")(
-            process.env.TWILIO_ACCOUNT_SID,
-            process.env.TWILIO_AUTH_TOKEN
-          );
+    const accountSid = process.env.TWILIO_ACCOUNT_SID;
+    const authToken = process.env.TWILIO_AUTH_TOKEN;
+    const client = new twilio(accountSid, authToken);
+    client.messages.create({
+    to: 'TO_PHONE',       // Replace with the recipient's phone number
+    from: 'FROM_PHONE',   // Replace with your Twilio phone number
+    body: 'utastaas twilio'
+     }).then(message => console.log("SMS илгээгдлээ. SID:", message.sid))
+    .catch(error => console.error("Алдаа гарлаа:", error));
+    // // Auto-forward the message to a verified phone number
+    // if (VERIFIED_PHONE_NUMBER && VERIFIED_PHONE_NUMBER.trim() !== '') {
+    //   // Check if Twilio credentials are available
+    //   if (!process.env.TWILIO_ACCOUNT_SID || !process.env.TWILIO_AUTH_TOKEN) {
+    //     console.error("Twilio credentials missing - message not forwarded");
+    //   } else {
+    //     try {
+    //       // Initialize Twilio client
+    //       const twilioClient = require("twilio")(
+    //         process.env.TWILIO_ACCOUNT_SID,
+    //         process.env.TWILIO_AUTH_TOKEN
+    //       );
           
-          // Construct the forwarded message
-          const forwardMsg = `${from}-с ирсэн мессэж: ${body}`;
+    //       // Construct the forwarded message
+    //       const forwardMsg = `${from}-с ирсэн мессэж: ${body}`;
           
-          console.log(`Attempting to forward message to ${VERIFIED_PHONE_NUMBER} from ${TWILIO_PHONE_NUMBER}`);
+    //       console.log(`Attempting to forward message to ${VERIFIED_PHONE_NUMBER} from ${TWILIO_PHONE_NUMBER}`);
           
-          // Forward the message
-          const twilioResponse = await twilioClient.messages.create({
-            body: forwardMsg,
-            from: TWILIO_PHONE_NUMBER, // Use the Twilio phone number here, not 'to'
-            to: VERIFIED_PHONE_NUMBER,
-            mediaUrl: mediaUrls.length > 0 ? mediaUrls : undefined
-          });
+    //       // Forward the message
+    //       const twilioResponse = await twilioClient.messages.create({
+    //         body: forwardMsg,
+    //         from: TWILIO_PHONE_NUMBER, // Use the Twilio phone number here, not 'to'
+    //         to: VERIFIED_PHONE_NUMBER,
+    //         mediaUrl: mediaUrls.length > 0 ? mediaUrls : undefined
+    //       });
           
-          // Save forwarded message to database
-          const forwardedMessage = new Message({
-            body: forwardMsg,
-            from: TWILIO_PHONE_NUMBER,
-            to: VERIFIED_PHONE_NUMBER,
-            messageSid: twilioResponse.sid,
-            numMedia: mediaUrls.length,
-            mediaUrls: mediaUrls.length > 0 ? mediaUrls : [],
-          });
-          await forwardedMessage.save();
+    //       // Save forwarded message to database
+    //       const forwardedMessage = new Message({
+    //         body: forwardMsg,
+    //         from: TWILIO_PHONE_NUMBER,
+    //         to: VERIFIED_PHONE_NUMBER,
+    //         messageSid: twilioResponse.sid,
+    //         numMedia: mediaUrls.length,
+    //         mediaUrls: mediaUrls.length > 0 ? mediaUrls : [],
+    //       });
+    //       await forwardedMessage.save();
           
-          console.log(`Message forwarded successfully: ${twilioResponse.sid}`);
-        } catch (fwdError) {
-          // Log forwarding error but don't fail the whole request
-          console.error("Error forwarding message:", fwdError);
-        }
-      }
-    } else {
-      console.log("No verified phone number set - message not forwarded");
-    }
+    //       console.log(`Message forwarded successfully: ${twilioResponse.sid}`);
+    //     } catch (fwdError) {
+    //       // Log forwarding error but don't fail the whole request
+    //       console.error("Error forwarding message:", fwdError);
+    //     }
+    //   }
+    // } else {
+    //   console.log("No verified phone number set - message not forwarded");
+    // }
 
     // Send empty TwiML response to avoid Twilio auto-reply
     const twiml = new MessagingResponse();
