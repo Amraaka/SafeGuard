@@ -54,7 +54,7 @@ async function sendResponseMessage(message) {
   const responseBody = `We received your message: "${message.body}"`;
 
   const response = await axios.post(
-    "https://bd3d-202-21-114-93.ngrok-free.app/api/message/send",
+    "https://db43-202-21-114-93.ngrok-free.app/api/message/send",
     {
       to: message.from, // Send back to the original sender
       body: responseBody,

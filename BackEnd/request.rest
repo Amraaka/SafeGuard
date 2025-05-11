@@ -1,6 +1,6 @@
 
 ###
-POST https://bd3d-202-21-114-93.ngrok-free.app/api/messages/webhook
+POST https://db43-202-21-114-93.ngrok-free.app/api/messages/webhook
 Content-Type: application/json
 {
       "body": "Сэрэмжлүүлэг мессэжийг таньд илгээж байна.!",
@@ -10,7 +10,7 @@ Content-Type: application/json
       "numMedia": 1,
 }
 ###
-POST https://bd3d-202-21-114-93.ngrok-free.app/api/messages/webhook
+POST https://db43-202-21-114-93.ngrok-free.app/api/messages/webhook
 Content-Type: application/json
 
 {
@@ -26,7 +26,7 @@ GET http://localhost:5000/api/messages
 Content-Type: application/json
 
 ###
-POST https://bd3d-202-21-114-93.ngrok-free.app/api/messages/send
+POST https://db43-202-21-114-93.ngrok-free.app/api/messages/send
 Content-Type: application/json
 
 {
@@ -55,7 +55,7 @@ Content-Type: application/json
 
 
 ###
-POST https://bd3d-202-21-114-93.ngrok-free.app/api/messages/webhook
+POST https://db43-202-21-114-93.ngrok-free.app/api/messages/webhook
 Content-Type: application/x-www-form-urlencoded
 
 Body=1234567fefedwwdfes3ббб3444567
