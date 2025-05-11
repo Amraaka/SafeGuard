@@ -4,14 +4,13 @@ POST https://0be3-202-55-188-85.ngrok-free.app/api/messages/webhook
 Content-Type: application/json
 
 {
-  "From": "+1234567890",
-  "To": "+97696068185",
-  "To": "+97696068185",
+  "From": "+19787979795",
+  "To": "+97699334270",
   "Body": "Test message"
 }
 
 ###
-GET http://localhost:3000/api/messages
+GET http://localhost:5000/api/messages
 Content-Type: application/json
 
 
