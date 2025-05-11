@@ -10,63 +10,67 @@ mongoose
   .then(() => console.log("MongoDB connected for message watcher"))
   .catch((err) => console.error("MongoDB connection error in watcher:", err));
 
-let lastProcessedMessageId = null;
+let lastProcessedTime = new Date();
 
 async function checkForNewMessages() {
   try {
-    const fifteenSecondsAgo = new Date(Date.now() - 15000);
-
+    const now = new Date();
     const newMessages = await Message.find({
       status: "received",
-      createdAt: { $gte: fifteenSecondsAgo },
-    });
+      createdAt: { $gte: lastProcessedTime, $lt: now }
+    }).sort({ createdAt: 1 }); // Process in order
 
     if (newMessages.length === 0) {
       console.log("No new messages to process");
+      lastProcessedTime = now; // Update even if no messages to avoid rechecking old ones
       return;
     }
 
     for (const message of newMessages) {
       console.log(`Processing new message: ${message.messageSid}`);
 
-      // Send a response message
-      await sendResponseMessage(message);
+      try {
+        // Send a response message
+        await sendResponseMessage(message);
 
-      // Update the message status to 'processed'
-      message.status = "processed";
-      await message.save();
-
-      console.log(`Message processed: ${message._id}`);
+        // Only update status if send was successful
+        message.status = "processed";
+        await message.save();
+        
+        console.log(`Message processed: ${message._id}`);
+      } catch (error) {
+        console.error(`Failed to process message ${message._id}:`, error);
+        // Consider adding retry logic or moving to failed status
+      }
     }
+
+    lastProcessedTime = now;
   } catch (error) {
     console.error("Error checking for new messages:", error);
   }
 }
 
 async function sendResponseMessage(message) {
-  try {
-    const to = "+97685114648";
-    const responseBody = `We received your message: "${message.body}"`;
+  const responseBody = `We received your message: "${message.body}"`;
 
-    const response = await axios.post(
-      "https://0723-202-55-188-85.ngrok-free.app/api/messages/send",
-      {
-        to: to, // Send back to the original sender
-        body: responseBody,
-      }
-    );
+  const response = await axios.post(
+    "https://3cc4-202-126-89-122.ngrok-free.app/api/messages/send",
+    {
+      to: message.from, // Send back to the original sender
+      body: responseBody,
+    }
+  );
 
-    console.log("Response sent successfully:", response.data);
-  } catch (error) {
-    console.error("Error sending response message:", error);
-  }
+  console.log("Response sent successfully:", response.data);
 }
 
 console.log("Starting message watcher...");
 
-checkForNewMessages();
-
-setInterval(checkForNewMessages, 15000);
+// Initial delay to let the server stabilize
+setTimeout(() => {
+  checkForNewMessages();
+  setInterval(checkForNewMessages, 15000);
+}, 5000);
 
 // Handle graceful shutdown
 process.on("SIGINT", async () => {
