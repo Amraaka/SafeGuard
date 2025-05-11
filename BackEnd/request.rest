@@ -19,9 +19,8 @@ POST https://92ad-202-55-188-85.ngrok-free.app/api/messages/send
 Content-Type: application/json
 
  {
-  "to": "+97685114648",
+  "to": "+97699334270",
   "body": "Dangerous!!!",
-
  }
 
 
