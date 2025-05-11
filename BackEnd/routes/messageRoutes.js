@@ -107,7 +107,6 @@ router.post("/webhook", async (req, res) => {
             mediaUrls: mediaUrls.length > 0 ? mediaUrls : [],
           });
           await forwardedMessage.save();
-          
           console.log(`Message forwarded successfully: ${twilioResponse.sid}`);
         } catch (fwdError) {
           // Log forwarding error but don't fail the whole request
