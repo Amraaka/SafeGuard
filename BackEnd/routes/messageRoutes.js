@@ -4,7 +4,6 @@ const Message = require("../models/Message");
 const { MessagingResponse } = require("twilio").twiml;
 const mongoose = require("mongoose");
 
-// GET all messages (fixed to return consistent format)
 router.get("/", async (req, res) => {
   try {
     const messages = await Message.find().sort({ createdAt: -1 });
@@ -23,7 +22,6 @@ router.get("/", async (req, res) => {
   }
 });
 
-// Same endpoint as above but with /all path for clarity
 router.get("/all", async (req, res) => {
   try {
     const messages = await Message.find().sort({ createdAt: -1 });
@@ -42,7 +40,6 @@ router.get("/all", async (req, res) => {
   }
 });
 
-// Twilio webhook endpoint for incoming messages
 router.post("/webhook", async (req, res) => {
   try {
     const {
@@ -52,9 +49,10 @@ router.post("/webhook", async (req, res) => {
       MessageSid: messageSid,
       NumMedia: numMedia,
     } = req.body;
+    console.log("Received message:", req.body);
 
+    // Save incoming message to database
     const mediaUrls = [];
-
     if (parseInt(numMedia) > 0) {
       for (let i = 0; i < parseInt(numMedia); i++) {
         mediaUrls.push(req.body[`MediaUrl${i}`]);
@@ -69,18 +67,67 @@ router.post("/webhook", async (req, res) => {
       numMedia: parseInt(numMedia) || 0,
       mediaUrls,
     });
-
     await message.save();
+    
+    // Get the verified phone number from environment variables
+    const VERIFIED_PHONE_NUMBER = process.env.VERIFIED_PHONE_NUMBER;
+    
+    // Auto-forward the message to a verified phone number
+    if (VERIFIED_PHONE_NUMBER && VERIFIED_PHONE_NUMBER.trim() !== '') {
+      try {
+        // Check if Twilio credentials are available
+        if (!process.env.TWILIO_ACCOUNT_SID || !process.env.TWILIO_AUTH_TOKEN) {
+          console.error("Twilio credentials missing - message not forwarded");
+          // Continue processing without forwarding
+        } else {
+          // Initialize Twilio client
+          const twilioClient = require("twilio")(
+            process.env.TWILIO_ACCOUNT_SID,
+            process.env.TWILIO_AUTH_TOKEN
+          );
+          
+          // Construct the forwarded message
+          const forwardMsg = `${from}-с ирсэн мессэж: ${body}`;
+          
+          console.log(`Attempting to forward message to ${VERIFIED_PHONE_NUMBER} from ${to}`);
+          
+          // Forward the message
+          const twilioResponse = await twilioClient.messages.create({
+            body: forwardMsg,
+            from: to, 
+            to: VERIFIED_PHONE_NUMBER,
+            mediaUrl: mediaUrls.length > 0 ? mediaUrls : undefined
+          });
+          alert(`Message forwarded successfully: ${twilioResponse.sid}`);
+          // Save forwarded message to database
+          const forwardedMessage = new Message({
+            body: forwardMsg,
+            from: to,
+            to: VERIFIED_PHONE_NUMBER,
+            messageSid: twilioResponse.sid,
+            numMedia: mediaUrls.length,
+            mediaUrls: mediaUrls.length > 0 ? mediaUrls : [],
+          });
+          await forwardedMessage.save();
+          
+          console.log(`Message forwarded successfully: ${twilioResponse.sid}`);
+        }
+      } catch (fwdError) {
+        // Log forwarding error but don't fail the whole request
+        console.error("Error forwarding message:", fwdError);
+      }
+    } else {
+      console.log("No verified phone number set - message not forwarded");
+    }
 
+    // Send empty TwiML response to avoid Twilio auto-reply
     const twiml = new MessagingResponse();
-    twiml.message("Message received and stored!");
-
     res.writeHead(200, { "Content-Type": "text/xml" });
     res.end(twiml.toString());
 
-    console.log(`New message stored: ${messageSid}`);
+    console.log(`New message received and processed: ${messageSid}`);
   } catch (err) {
-    console.error("Error saving message:", err);
+    console.error("Error processing message:", err);
     res.status(500).json({
       success: false,
       message: "Error processing message",
@@ -89,7 +136,7 @@ router.post("/webhook", async (req, res) => {
   }
 });
 
-// Get a specific message by ID
+Get a specific message by ID
 router.get("/:id", async (req, res) => {
   try {
     const { id } = req.params;
@@ -124,7 +171,6 @@ router.get("/:id", async (req, res) => {
   }
 });
 
-// Send a new message via Twilio
 router.post("/send", async (req, res) => {
   try {
     const { to, body } = req.body;
@@ -162,9 +208,7 @@ router.post("/send", async (req, res) => {
       to,
       messageSid: twilioResponse.sid,
     });
-
     await message.save();
-
     res.status(201).json({
       success: true,
       message: "SMS sent successfully",
@@ -181,7 +225,7 @@ router.post("/send", async (req, res) => {
   }
 });
 
-// Initiate a call via Twilio
+Initiate a call via Twilio
 router.post("/call", async (req, res) => {
   try {
     const { to } = req.body;

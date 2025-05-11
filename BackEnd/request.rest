@@ -1,38 +1,41 @@
 
 ###
-POST https://0be3-202-55-188-85.ngrok-free.app/api/messages/webhook
+POST https://bd3d-202-21-114-93.ngrok-free.app/api/messages/webhook
+Content-Type: application/json
+{
+      "body": "Сэрэмжлүүлэг мессэжийг таньд илгээж байна.!",
+      "from": "+19787979795",
+      "to": "+97699334270",
+      "messageSid": "SMf3e0a2b4c5d4e1a8b7c8f9e0a1b2c3d",
+      "numMedia": 1,
+}
+###
+POST https://bd3d-202-21-114-93.ngrok-free.app/api/messages/webhook
 Content-Type: application/json
 
 {
-  "From": "+19787979795",
-  "To": "+97699334270",
-  "Body": "Test message"
+  "Body": "Сэрэмжлүүлэг мессэжийг таньд илгээж байна.!",
+  "From": "+97699334270",
+  "To": "+19787979795",
+  "MessageSid": "SMf3e0a2b4c5d4e1уөуa8b7c8f9e0a1b2c3d",
+  "NumMedia": "1",
+  "MediaUrl0": "https://example.com/media/image.jpg"
 }
-
 ###
 GET http://localhost:5000/api/messages
 Content-Type: application/json
 
-
 ###
-POST https://92ad-202-55-188-85.ngrok-free.app/api/messages/send
-Content-Type: application/json
-
- {
-  "to": "+97699334270",
-  "body": "Dangerous!!!",
- }
-
-
-###
-POST https://0be3-202-55-188-85.ngrok-free.app/api/messages/send
+POST https://bd3d-202-21-114-93.ngrok-free.app/api/messages/send
 Content-Type: application/json
 
 {
-  "to": "+97696068185",
-  "to": "+97696068185",
+  "from": "+19787979795",
+  "to": "+97699334270",
   "body": "Сэрэмжлүүлэг мессэжийг таньд илгээж байна.!"
 }
+
+
 
 ###
 POST https://766d-202-55-188-85.ngrok-free.app/api/messages/call
@@ -48,4 +51,18 @@ Content-Type: application/json
 GET https://3cc4-202-126-89-122.ngrok-free.app/api/allMes/all
 GET https://3cc4-202-126-89-122.ngrok-free.app/api/allMes/all
 Content-Type: application/json
+
+
+
+###
+POST https://bd3d-202-21-114-93.ngrok-free.app/api/messages/webhook
+Content-Type: application/x-www-form-urlencoded
+
+Body=1234567fefedwwdfes3ббб3444567
+&From=+97696068185
+&To=+19787979795
+&MessageSid=SM{{$guid}}
+&NumMedia=0
+
+
 

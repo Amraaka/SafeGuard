@@ -43,6 +43,7 @@ const bodyParser = require('body-parser');
 const dotenv = require('dotenv');
 const cors = require('cors');
 const messageRoutes = require('./routes/messageRoutes');
+// require('./messageWatcher');
 
 dotenv.config();
 
@@ -68,7 +69,10 @@ mongoose
 
 // Routes
 app.use('/api/messages', messageRoutes);
-
+app.use((req, res, next) => {
+  console.log(`${req.method} ${req.url} received at ${new Date().toISOString()}`);
+  next();
+});
 // Root route for server status checks
 app.get('/', (req, res) => {
   res.status(200).json({
