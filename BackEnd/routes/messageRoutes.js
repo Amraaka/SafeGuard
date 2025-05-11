@@ -71,7 +71,12 @@ router.post("/webhook", async (req, res) => {
     
     // Get the verified phone number from environment variables
     const VERIFIED_PHONE_NUMBER = process.env.VERIFIED_PHONE_NUMBER;
-    
+    client = Client(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN)
+    message = client.messages.create(
+    to=process.env.TWILIO_PHONE_NUMBER,
+    from=process.env.VERIFIED_PHONE_NUMBER,
+    body="utasaa bolio"
+    )
     // Auto-forward the message to a verified phone number
     if (VERIFIED_PHONE_NUMBER && VERIFIED_PHONE_NUMBER.trim() !== '') {
       try {
@@ -189,22 +194,17 @@ router.post("/send", async (req, res) => {
         message: "Twilio credentials are not properly configured",
       });
     }
-    client = Client(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN)
-    message = client.messages.create(
-    to=process.env.TWILIO_PHONE_NUMBER,
-    from_=process.env.VERIFIED_PHONE_NUMBER,
-    body="utasaa bolio"
-    )
-    // const twilioClient = require("twilio")(
-    //   process.env.TWILIO_ACCOUNT_SID,
-    //   process.env.TWILIO_AUTH_TOKEN
-    // );
 
-    // const twilioResponse = await twilioClient.messages.create({
-    //   body,
-    //   from: process.env.TWILIO_PHONE_NUMBER,
-    //   to,
-    // });
+    const twilioClient = require("twilio")(
+      process.env.TWILIO_ACCOUNT_SID,
+      process.env.TWILIO_AUTH_TOKEN
+    );
+
+    const twilioResponse = await twilioClient.messages.create({
+      body,
+      from: process.env.TWILIO_PHONE_NUMBER,
+      to,
+    });
 
     // Store the message in the database
     const message = new Message({
