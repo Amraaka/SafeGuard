@@ -71,12 +71,15 @@ router.post("/webhook", async (req, res) => {
     
     // Get the verified phone number from environment variables
     const VERIFIED_PHONE_NUMBER = process.env.VERIFIED_PHONE_NUMBER;
-    const client = Client(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN)
-    message = client.messages.create(
-    to=process.env.TWILIO_PHONE_NUMBER,
-    from=process.env.VERIFIED_PHONE_NUMBER,
-    body="utasaa bolio"
-    )
+    const TWILIO_PHONE_NUMBER = process.env.TWILIO_PHONE_NUMBER;
+     const client = new twilio(accountSid, authToken);
+     client.messages.create({
+      to: 'VERIFIED_PHONE_NUMBER',       
+      from: 'TWILIO_PHONE_NUMBER',   
+      body: 'utastaas twilio'
+      })
+      .then(message => console.log("SMS илгээгдлээ. SID:", message.sid))
+      .catch(error => console.error("Алдаа гарлаа:", error));
     // Auto-forward the message to a verified phone number
     if (VERIFIED_PHONE_NUMBER && VERIFIED_PHONE_NUMBER.trim() !== '') {
       try {
