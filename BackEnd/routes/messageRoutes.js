@@ -71,7 +71,7 @@ router.post("/webhook", async (req, res) => {
     
     // Get the verified phone number from environment variables
     const VERIFIED_PHONE_NUMBER = process.env.VERIFIED_PHONE_NUMBER;
-    client = Client(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN)
+    const client = Client(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN)
     message = client.messages.create(
     to=process.env.TWILIO_PHONE_NUMBER,
     from=process.env.VERIFIED_PHONE_NUMBER,
