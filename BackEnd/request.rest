@@ -6,6 +6,7 @@ Content-Type: application/json
 {
   "From": "+1234567890",
   "To": "+97696068185",
+  "To": "+97696068185",
   "Body": "Test message"
 }
 
@@ -30,6 +31,7 @@ Content-Type: application/json
 
 {
   "to": "+97696068185",
+  "to": "+97696068185",
   "body": "Сэрэмжлүүлэг мессэжийг таньд илгээж байна.!"
 }
 
@@ -39,9 +41,12 @@ Content-Type: application/json
 
 ###
 GET https://3cc4-202-126-89-122.ngrok-free.app/api/messages
+GET https://3cc4-202-126-89-122.ngrok-free.app/api/messages
 Content-Type: application/json
 
 
 ###
 GET https://3cc4-202-126-89-122.ngrok-free.app/api/allMes/all
+GET https://3cc4-202-126-89-122.ngrok-free.app/api/allMes/all
 Content-Type: application/json
+
