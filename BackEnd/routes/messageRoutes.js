@@ -50,7 +50,7 @@ router.post("/webhook", async (req, res) => {
       NumMedia: numMedia,
     } = req.body;
     console.log("Received message:", req.body);
-
+    
     // Save incoming message to database
     const mediaUrls = [];
     if (parseInt(numMedia) > 0) {
@@ -58,7 +58,7 @@ router.post("/webhook", async (req, res) => {
         mediaUrls.push(req.body[`MediaUrl${i}`]);
       }
     }
-
+    
     const message = new Message({
       body,
       from,
@@ -68,18 +68,10 @@ router.post("/webhook", async (req, res) => {
       mediaUrls,
     });
     await message.save();
-
+    
     const VERIFIED_PHONE_NUMBER = process.env.VERIFIED_PHONE_NUMBER;
     const TWILIO_PHONE_NUMBER = process.env.TWILIO_PHONE_NUMBER;
-    const accountSid = process.env.TWILIO_ACCOUNT_SID;
-    const authToken = process.env.TWILIO_AUTH_TOKEN;
-    const client = new twilio(accountSid, authToken);
-    client.messages.create({
-    to: VERIFIED_PHONE_NUMBER,       // Replace with the recipient's phone number
-    from: TWILIO_PHONE_NUMBER,   // Replace with your Twilio phone number
-    body: 'utastaas twilio'
-     }).then(message => console.log("SMS илгээгдлээ. SID:", message.sid))
-    .catch(error => console.error("Алдаа гарлаа:", error));
+    
     // Auto-forward the message to a verified phone number
     if (VERIFIED_PHONE_NUMBER && VERIFIED_PHONE_NUMBER.trim() !== '') {
       // Check if Twilio credentials are available
@@ -98,10 +90,10 @@ router.post("/webhook", async (req, res) => {
           
           console.log(`Attempting to forward message to ${VERIFIED_PHONE_NUMBER} from ${TWILIO_PHONE_NUMBER}`);
           
-          // Forward the message
+          // Forward the message - fixed the parameters to match Twilio's expected format
           const twilioResponse = await twilioClient.messages.create({
             body: forwardMsg,
-            from: TWILIO_PHONE_NUMBER, // Use the Twilio phone number here, not 'to'
+            from: TWILIO_PHONE_NUMBER,
             to: VERIFIED_PHONE_NUMBER,
             mediaUrl: mediaUrls.length > 0 ? mediaUrls : undefined
           });
@@ -126,12 +118,12 @@ router.post("/webhook", async (req, res) => {
     } else {
       console.log("No verified phone number set - message not forwarded");
     }
-
+    
     // Send empty TwiML response to avoid Twilio auto-reply
     const twiml = new MessagingResponse();
     res.writeHead(200, { "Content-Type": "text/xml" });
     res.end(twiml.toString());
-
+    
     console.log(`New message received and processed: ${messageSid}`);
   } catch (err) {
     console.error("Error processing message:", err);
